@@ -36,7 +36,7 @@ class AutoCmd:
     def generate_access(self, lane_path: str, access_path: str) -> list:
         with open(lane_path, "r") as f:
             lanes: list = json.load(f)
-            my_access = random.sample(lanes, random.randint(int(len(lanes) / 1000), int(len(lanes) / 500)))
+            my_access = random.sample(lanes, random.randint(int(len(lanes) / 10000), int(len(lanes) / 5000)))
             f.close()
         with open(access_path, "w") as f:
             list_ = [False] * lanes_length
@@ -47,10 +47,10 @@ class AutoCmd:
         return list_
 
     def runcmd(self, command: str, output_path: str, save_result_path: str, list_: list):
-        print("running: max waiting time=", self.waiting_time)
+        print("running: max waiting time =", self.waiting_time)
         ret = subprocess.run(command,shell=True,stdout=subprocess.PIPE,stderr=subprocess.PIPE,encoding="utf-8",timeout=self.waiting_time)    
         if ret.returncode == 0:
-            print("success", end=" ")
+            print("success:", end=" ")
             self.get_result(output_path, save_result_path, list_)
         else:
             print("error:",ret)
@@ -73,7 +73,7 @@ class AutoCmd:
         time_path = output_path + "/time.txt"
         with open(time_path, "r") as f:
             first_line = f.readline().strip()
-            print("avg time: ", first_line)
+            print("avg time =", first_line)
             f.close()
         result_list.append({first_line: access_list})
         with open(save_result_path, "w") as f:

@@ -18,31 +18,38 @@ save_result_path = "/home/ubuntu/qry-codespace/city/data/save-result.json"
 # cmd
 my_command = "sudo docker run --mount type=bind,source=" + output_path + ",target=/output --mount type=bind,source=" + access_path + ",target=/access.txt --rm git.tsingroc.com:5050/release/cup2109:latest"
 
-# params
-lanes_length = 35189
-waiting_time = 420 # s
-
 class AutoCmd:
 
     waiting_time: int
 
+    lanes_length: int
+
     shut_down_flag: bool
 
-    def __init__(self, waiting_time: int) -> None:
+    def __init__(self, waiting_time: int, lanes_length: int) -> None:
         self.waiting_time = waiting_time
-        self.runCounter = 0
+        self.lanes_length = lanes_length
         self.shut_down_flag = False
 
     def generate_access(self, lane_path: str, access_path: str) -> list:
-        with open(lane_path, "r") as f:
-            lanes: list = json.load(f)
-            my_access = random.sample(lanes, random.randint(int(len(lanes) / 10000), int(len(lanes) / 5000)))
-            f.close()
+        my_access = []
+        try:
+            with open(lane_path, "r") as f:
+                lanes: list = json.load(f)
+                my_access = random.sample(lanes, random.randint(1, 10))
+                f.close()
+        except JSONDecodeError or FileNotFoundError:
+            lanes_list = []
+            for i in range(self.lanes_length):
+                lanes_list.append(i)
+            with open(lane_path, "w") as f:
+                json.dump(lanes_list, f)
+                f.close()
         with open(access_path, "w") as f:
-            list_ = [False] * lanes_length
+            list_ = []
             for item in my_access:
                 f.write(str(item) + '\n')
-                list_[item] = True
+                list_.append(item)
             f.close()
         return list_
 
@@ -75,16 +82,20 @@ class AutoCmd:
             first_line = f.readline().strip()
             print("avg time =", first_line)
             f.close()
-        result_list.append({first_line: access_list})
+        result_list.append([first_line, access_list])
         with open(save_result_path, "w") as f:
             json.dump(result_list, f)
             f.close()
 
-my_auto_cmd = AutoCmd(420)
-for i in range(2):
-    list_ = my_auto_cmd.generate_access(lane_path ,access_path)
-    my_auto_cmd.runcmd(my_command, output_path, save_result_path, list_)
-    if (my_auto_cmd.shut_down_flag):
-        print("TimeError: break in " + str(i + 1) + "/5")
-        break
-    print("process: " + str(i + 1) + "/5")
+if __name__ == "__main__":
+    my_auto_cmd = AutoCmd(waiting_time=420, lanes_length=35189)
+    cycle_times = 10
+    for i in range(cycle_times):
+        list_ = my_auto_cmd.generate_access(lane_path ,access_path)
+        my_auto_cmd.runcmd(my_command, output_path, save_result_path, list_)
+        if (my_auto_cmd.shut_down_flag):
+            print("TimeError: break in " + str(i + 1) + "/" + cycle_times)
+            break
+        print("process: " + str(i + 1) + "/" + cycle_times)
+
+# cmd: nohup python3 /home/ubuntu/qry-codespace/city/src/auto-cmd.py &

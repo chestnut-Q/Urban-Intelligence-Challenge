@@ -94,8 +94,8 @@ if __name__ == "__main__":
         list_ = my_auto_cmd.generate_access(lane_path ,access_path)
         my_auto_cmd.runcmd(my_command, output_path, save_result_path, list_)
         if (my_auto_cmd.shut_down_flag):
-            print("TimeError: break in " + str(i + 1) + "/" + cycle_times)
+            print("TimeError: break in " + str(i + 1) + "/" + str(cycle_times))
             break
-        print("process: " + str(i + 1) + "/" + cycle_times)
+        print("process: " + str(i + 1) + "/" + str(cycle_times))
 
 # cmd: nohup python3 /home/ubuntu/qry-codespace/city/src/auto-cmd.py &

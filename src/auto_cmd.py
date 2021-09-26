@@ -1,4 +1,4 @@
-# python version: 3.8.5
+# python version: 3.6.7
 #
 # test env: wsl2 ubuntu
 #
@@ -16,7 +16,7 @@ output_path = "/home/ubuntu/qry-codespace/city/data/output"
 save_result_path = "/home/ubuntu/qry-codespace/city/data/save-result.json"
 
 # cmd
-my_command = "docker run --mount type=bind,source=" + output_path + ",target=/output --mount type=bind,source=" + access_path + ",target=/access.txt --rm git.tsingroc.com:5050/release/cup2109:latest"
+my_command = "sudo docker run --mount type=bind,source=" + output_path + ",target=/output --mount type=bind,source=" + access_path + ",target=/access.txt --rm git.tsingroc.com:5050/release/cup2109:latest"
 
 class AutoCmd:
 
@@ -31,14 +31,15 @@ class AutoCmd:
         self.lanes_length = lanes_length
         self.shut_down_flag = False
 
-    def generate_access(self, lane_path: str, access_path: str) -> list:
+    def generate_access(self, lane_path: str, access_path: str, upper_num: int, lower_num: int) -> list:
         my_access = []
         try:
             with open(lane_path, "r") as f:
                 lanes: list = json.load(f)
-                my_access = random.sample(lanes, random.randint(1, 10))
+                my_access = random.sample(lanes, random.randint(upper_num, lower_num))
+                # my_access = [2357, 18173, 27946, 18909, 7021, 33303, 23786, 103, 23244, 16422]
                 f.close()
-        except JSONDecodeError or FileNotFoundError:
+        except (JSONDecodeError, FileNotFoundError):
             lanes_list = []
             for i in range(self.lanes_length):
                 lanes_list.append(i)
@@ -72,7 +73,7 @@ class AutoCmd:
             with open(save_result_path, "r", encoding="utf-8") as f:
                 result_list: list = json.load(f)
                 f.close()        
-        except JSONDecodeError or FileNotFoundError:
+        except (JSONDecodeError, FileNotFoundError):
             with open(save_result_path, "w") as f:
                 f.write("[]")
                 f.close()
@@ -89,13 +90,14 @@ class AutoCmd:
 
 if __name__ == "__main__":
     my_auto_cmd = AutoCmd(waiting_time=420, lanes_length=35189)
-    cycle_times = 10
+    cycle_times = 1
     for i in range(cycle_times):
-        list_ = my_auto_cmd.generate_access(lane_path ,access_path)
+        list_ = my_auto_cmd.generate_access(lane_path ,access_path, 1, 50)
         my_auto_cmd.runcmd(my_command, output_path, save_result_path, list_)
         if (my_auto_cmd.shut_down_flag):
             print("TimeError: break in " + str(i + 1) + "/" + str(cycle_times))
             break
         print("process: " + str(i + 1) + "/" + str(cycle_times))
 
-# cmd: nohup python3 /home/ubuntu/qry-codespace/city/src/auto-cmd.py &
+# cmd: nohup python3 /home/ubuntu/qry-codespace/city/src/auto_cmd.py &
+# cmd: nohup python3 -u /home/ubuntu/qry-codespace/city/src/auto_cmd.py > /home/ubuntu/qry-codespace/city/store/output.log &

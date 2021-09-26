@@ -16,7 +16,7 @@ output_path = "/home/ubuntu/qry-codespace/city/data/output"
 save_result_path = "/home/ubuntu/qry-codespace/city/data/save-result.json"
 
 # cmd
-my_command = "sudo docker run --mount type=bind,source=" + output_path + ",target=/output --mount type=bind,source=" + access_path + ",target=/access.txt --rm git.tsingroc.com:5050/release/cup2109:latest"
+my_command = "docker run --mount type=bind,source=" + output_path + ",target=/output --mount type=bind,source=" + access_path + ",target=/access.txt --rm git.tsingroc.com:5050/release/cup2109:latest"
 
 class AutoCmd:
 

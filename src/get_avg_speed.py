@@ -1,6 +1,8 @@
 # 1. 函数参数: traj_path = traj.txt路径, spped_path = 保存结果路径(文件可以没有)
 #
-# 2. 预计用时5min
+# 2. json数据格式: (车道id, [平均速度, 车流量]) 按平均速度降序排列
+# 
+# 3. 预计用时5min
 
 import json
 import time
